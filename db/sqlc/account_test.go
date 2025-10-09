@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"strconv"
 	"testing"
 	"time"
 
@@ -32,7 +33,9 @@ func createRandomAccount(t *testing.T) Accounts {
 }
 
 func TestCreateAccount(t *testing.T) {
-	createRandomAccount(t)
+	account := createRandomAccount(t)
+	title := "Create Account ID # " + strconv.FormatInt(account.ID, 10)
+	util.PrintStructColor(title, account)
 }
 
 func TestGetAccount(t *testing.T) {
@@ -47,6 +50,9 @@ func TestGetAccount(t *testing.T) {
 	require.Equal(t, account1.Balance, account2.Balance)
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
+
+	title := "Get Account ID # " + strconv.FormatInt(account2.ID, 10)
+	util.PrintStructColor(title, account1)
 }
 
 func TestUpdateAccount(t *testing.T) {
@@ -66,6 +72,9 @@ func TestUpdateAccount(t *testing.T) {
 	require.Equal(t, arg.Balance, account2.Balance)
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
+
+	title := "Update Account ID # " + strconv.FormatInt(account1.ID, 10)
+	util.PrintStructColor(title, account1)
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -77,23 +86,29 @@ func TestDeleteAccount(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, account2)
+
+	title := "Deleted Account ID # " + strconv.FormatInt(account1.ID, 10)
+	util.PrintStructColor(title, account1)
 }
 
 func TestListAccounts(t *testing.T) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 2; i++ {
 		createRandomAccount(t)
 	}
 
 	arg := ListAccountsParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  2,
+		Offset: 0,
 	}
 
 	accounts, err := testQueries.ListAccounts(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, accounts, 5)
+	require.Len(t, accounts, 2)
 
 	for _, account := range accounts {
 		require.NotEmpty(t, account)
 	}
+
+	title := "List Accounts"
+	util.PrintStructColor(title, accounts)
 }

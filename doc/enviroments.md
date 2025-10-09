@@ -1,154 +1,155 @@
-🧩 1. Declaración de variables (var)
+1. Tipos de datps
 
-Se usa para declarar una o más variables, con o sin valor inicial.
+    #### Define nuevos tipos basados en los existentes, o estructuras personalizadas.
 
-var nombre string
-var edad int = 30
-var activo = true // el tipo se infiere
+    ```
+    type ID int
+    type Nombre string
+    ```
 
-También puedes agruparlas:
+    ```
+    type Persona struct {
+        Nombre string
+        Edad   int
+    }
+    ```
 
-var (
-    usuario = "roberto"
-    puntos  = 100
-)
+    ```
+    type Lector interface {
+        Leer() string
+    }
+    ```
 
+    ```
+    type ListaDeCadenas = []string // alias de tipo
+    ```
 
-Y dentro de funciones, puedes usar la declaración corta:
+1. Var
+    #### Se usa para declarar una o más variables, con o sin valor inicial.
+    ```
+    var nombre string
+    var edad int = 30
+    var activo = true // el tipo se infiere
+    ```
+    ```
+    var (
+        usuario = "roberto"
+        puntos  = 100
+    )
+    ```
+    ```
+    mensaje := "Hola mundo" // equivalente a var mensaje = "Hola mundo"
+    ```
 
-mensaje := "Hola mundo" // equivalente a var mensaje = "Hola mundo"
-
-🧠 2. Declaración de constantes (const)
-
-Las constantes no pueden cambiar de valor después de ser declaradas.
-
-const Pi = 3.1416
-const (
-    Puerto = 8080
-    Host   = "localhost"
-)
-
-⚙️ 3. Declaración de tipos (type)
-
-Define nuevos tipos basados en los existentes, o estructuras personalizadas.
-
-type ID int
-type Nombre string
-
-
-También se usa para declarar structs, interfaces o alias:
-
-type Persona struct {
-    Nombre string
-    Edad   int
-}
-
-type Lector interface {
-    Leer() string
-}
-
-type ListaDeCadenas = []string // alias de tipo
-
-🔁 4. Declaración de funciones (func)
-
-Define funciones o métodos.
-
-func Sumar(a int, b int) int {
-    return a + b
-}
-
-func (p Persona) Saludar() string {
-    return "Hola, soy " + p.Nombre
-}
-
-📦 5. Declaración de imports (import)
-
-Importa paquetes del estándar o externos.
-
-import "fmt"
-
-import (
-    "os"
-    "strings"
-)
+2. Const
+    #### Las constantes no pueden cambiar de valor después de ser declaradas.
+    ```
+    const Pi = 3.1416
+    const (
+        Puerto = 8080
+        Host   = "localhost"
+    )
+    ```
 
 
-También puedes importar con alias o anónimo:
+4. Declaración de funciones (func)
 
-import io "io/ioutil" // alias
-import _ "github.com/lib/pq" // solo ejecutar init()
+    #### Define funciones o métodos.
+    ```
+    func Sumar(a int, b int) int {
+        return a + b
+    }
+    ```
+    ```
+    func (p Persona) Saludar() string {
+        return "Hola, soy " + p.Nombre
+    }
+    ```
 
-🧱 6. Declaración de paquetes (package)
+5. Imports (import)
 
-Cada archivo Go comienza con una declaración de paquete:
+    #### Importa paquetes del estándar o externos.
 
-package main
+    ```
+    import "fmt"
+    ```
 
-🧩 7. Declaración de bloques
+    ```
+    import (
+        "os"
+        "strings"
+    )
+    ```
 
-Go permite agrupar declaraciones (var, const, type) en bloques:
-
-const (
-    Lunes = iota
-    Martes
-    Miercoles
-)
-
-
-🔠 Reglas de visibilidad en Go
-
-En Go, la primera letra del nombre (de una función, variable, tipo, struct, etc.) determina si es exportado o no desde su paquete.
-
-Nombre	Visible fuera del paquete	Descripción
-🔹 Mayúscula inicial	✅ Sí (exportado)	Puede ser usado por otros paquetes.
-🔸 Minúscula inicial	🚫 No (privado)	Solo puede ser usado dentro del mismo paquete.
-🔍 Ejemplo
-package utils
-
-// Exportada — visible desde otros paquetes
-func Sumar(a, b int) int {
-    return a + b
-}
-
-// No exportada — solo visible dentro de utils
-func restar(a, b int) int {
-    return a - b
-}
+    ```
+    import io "io/ioutil" // alias
+    import _ "github.com/lib/pq" // solo ejecutar init()
+    ```
 
 
-Y si en otro archivo tienes:
+6. Packages (package)
+    #### Cada archivo Go comienza con una declaración de paquete:
 
-package main
+    ```
+    package main
+    ```
 
-import "miapp/utils"
-
-func main() {
-    utils.Sumar(3, 4) // ✅ OK
-    utils.restar(3, 4) // ❌ Error: restar no está exportada
-}
-
-⚙️ Esto aplica también a:
-
-Variables:
-
-var Nombre = "Roberto" // exportada
-var edad = 30           // privada
+7. Visibilidad en Go
+    #### La primera letra del nombre (de una función, variable, tipo, struct, etc.) determina si es exportado o no desde su paquete.
 
 
-Structs y sus campos:
+    - 🔹 Mayúscula inicial	✅ Sí (exportado)	Puede ser usado por otros paquetes.
+        ```
+        package utils
 
-type Persona struct {
-    Nombre string // exportado
-    edad   int    // privado
-}
+        func Sumar(a, b int) int {
+            return a + b
+        }
+        ```
+    - 🔸 Minúscula inicial	🚫 No (privado)	Solo puede ser usado dentro del mismo paquete.
+        ```
+        package utils
+
+        func restar(a, b int) int {
+            return a - b
+        }
+        ```
+
+    - En otro archivo:
+        ```
+        package main
+
+        import "miapp/utils"
+
+        func main() {
+            utils.Sumar(3, 4) // ✅ OK
+            utils.restar(3, 4) // ❌ Error: restar no está exportada
+        }
+        ```
+    - Esto aplica también a:
+        - Variables:
+            ```
+            var Nombre = "Roberto" // exportada
+            var edad = 30           // privada
+            ```
+        - Structs y sus campos:
+            ```
+            type Persona struct {
+                Nombre string // exportado
+                edad   int    // privado
+            }
+            ```
+        - Interfaces, tipos y constantes:
+            ```
+            type Lector interface { Leer() error } // exportado
+            type escritor interface { escribir() } // privado
+            ```
+        - En resumen
+            ```
+            Prefijo	Ejemplo	Nivel de acceso
+            Mayúscula	Sumar, Usuario, ConfigGlobal	Público (exportado)
+            Minúscula	sumar, usuario, configGlobal	Privado (interno al paquete)
+            ```
 
 
-Interfaces, tipos y constantes:
 
-type Lector interface { Leer() error } // exportado
-type escritor interface { escribir() } // privado
-
-💡 En resumen
-Prefijo	Ejemplo	Nivel de acceso
-Mayúscula	Sumar, Usuario, ConfigGlobal	Público (exportado)
-Minúscula	sumar, usuario, configGlobal	Privado (interno al paquete)
