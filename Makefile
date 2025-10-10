@@ -1,3 +1,7 @@
+format-sql:
+	@for file in db/query/*.sql; do \
+		pg_format "$$file" -o "$$file"; \
+	done
 postgres:
 	docker run --name postgres12 -p 5432:5432 \
 		-e POSTGRES_USER=myuser \

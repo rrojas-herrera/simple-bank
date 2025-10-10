@@ -1,22 +1,39 @@
 -- name: CreateEntry :one
-INSERT INTO
-    entries (account_id, amount)
-VALUES
-    ($1, $2) RETURNING *;
+INSERT INTO entries (account_id, amount)
+    VALUES (sqlc.arg (account_id), sqlc.arg (amount))
+RETURNING
+    *;
 
 -- name: GetEntry :one
-SELECT * FROM entries WHERE id = $1 LIMIT 1;
+SELECT
+    *
+FROM
+    entries
+WHERE
+    id = sqlc.arg (id)
+LIMIT 1;
 
 -- name: ListEntries :many
-SELECT * FROM entries
-    ORDER BY id
-    LIMIT $1 OFFSET $2;
+SELECT
+    *
+FROM
+    entries
+ORDER BY
+    id
+LIMIT sqlc.arg ( LIMIT)
+    OFFSET sqlc.arg (OFFSET);
 
 -- name: UpdateEntry :one
-UPDATE entries
-    SET amount = $2
-    WHERE id = $1
-    RETURNING *;
+UPDATE
+    entries
+SET
+    amount = sqlc.arg (amount)
+WHERE
+    id = sqlc.arg (id)
+RETURNING
+    *;
 
 -- name: DeleteEntry :exec
-DELETE FROM entries WHERE id = $1;
+DELETE FROM entries
+WHERE id = sqlc.arg (id);
+

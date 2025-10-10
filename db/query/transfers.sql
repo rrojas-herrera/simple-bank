@@ -1,22 +1,39 @@
 -- name: CreateTransfer :one
-INSERT INTO
-    transfers (from_account_id, to_account_id, amount)
-VALUES
-    ($1, $2, $3) RETURNING *;
+INSERT INTO transfers (from_account_id, to_account_id, amount)
+    VALUES (sqlc.arg (from_account_id), sqlc.arg (to_account_id), sqlc.arg (amount))
+RETURNING
+    *;
 
 -- name: GetTransfer :one
-SELECT * FROM transfers WHERE id = $1 LIMIT 1;
+SELECT
+    *
+FROM
+    transfers
+WHERE
+    id = sqlc.arg (id)
+LIMIT 1;
 
 -- name: ListTransfers :many
-SELECT * FROM transfers
-    ORDER BY id
-    LIMIT $1 OFFSET $2;
+SELECT
+    *
+FROM
+    transfers
+ORDER BY
+    id
+LIMIT sqlc.arg ( LIMIT)
+    OFFSET sqlc.arg (OFFSET);
 
 -- name: UpdateTransfer :one
-UPDATE transfers
-    SET amount = $2
-    WHERE id = $1
-    RETURNING *;
+UPDATE
+    transfers
+SET
+    amount = sqlc.arg (amount)
+WHERE
+    id = sqlc.arg (id)
+RETURNING
+    *;
 
 -- name: DeleteTransfer :exec
-DELETE FROM transfers WHERE id = $1;
+DELETE FROM transfers
+WHERE id = sqlc.arg (id);
+
