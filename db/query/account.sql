@@ -24,14 +24,7 @@ LIMIT 1
 FOR NO KEY UPDATE;
 
 -- name: ListAccounts :many
-SELECT
-    *
-FROM
-    accounts
-ORDER BY
-    id
-LIMIT sqlc.arg ( LIMIT)
-    OFFSET sqlc.arg (OFFSET);
+SELECT * FROM accounts ORDER BY id LIMIT $1 OFFSET $2;
 
 -- name: UpdateAccount :one
 UPDATE

@@ -10,10 +10,10 @@ import (
 )
 
 const createEntry = `-- name: CreateEntry :one
-INSERT INTO
-    entries (account_id, amount)
-VALUES
-    ($1, $2) RETURNING id, account_id, amount, created_at
+INSERT INTO entries (account_id, amount)
+    VALUES ($1, $2)
+RETURNING
+    id, account_id, amount, created_at
 `
 
 type CreateEntryParams struct {
@@ -34,7 +34,8 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entri
 }
 
 const deleteEntry = `-- name: DeleteEntry :exec
-DELETE FROM entries WHERE id = $1
+DELETE FROM entries
+WHERE id = $1
 `
 
 func (q *Queries) DeleteEntry(ctx context.Context, id int64) error {
@@ -43,7 +44,13 @@ func (q *Queries) DeleteEntry(ctx context.Context, id int64) error {
 }
 
 const getEntry = `-- name: GetEntry :one
-SELECT id, account_id, amount, created_at FROM entries WHERE id = $1 LIMIT 1
+SELECT
+    id, account_id, amount, created_at
+FROM
+    entries
+WHERE
+    id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetEntry(ctx context.Context, id int64) (Entries, error) {
@@ -59,9 +66,13 @@ func (q *Queries) GetEntry(ctx context.Context, id int64) (Entries, error) {
 }
 
 const listEntries = `-- name: ListEntries :many
-SELECT id, account_id, amount, created_at FROM entries
-    ORDER BY id
-    LIMIT $1 OFFSET $2
+SELECT
+    id, account_id, amount, created_at
+FROM
+    entries
+ORDER BY
+    id
+LIMIT $1 OFFSET $2
 `
 
 type ListEntriesParams struct {
@@ -75,7 +86,7 @@ func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Ent
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Entries
+	items := []Entries{}
 	for rows.Next() {
 		var i Entries
 		if err := rows.Scan(
@@ -98,19 +109,23 @@ func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Ent
 }
 
 const updateEntry = `-- name: UpdateEntry :one
-UPDATE entries
-    SET amount = $2
-    WHERE id = $1
-    RETURNING id, account_id, amount, created_at
+UPDATE
+    entries
+SET
+    amount = $1
+WHERE
+    id = $2
+RETURNING
+    id, account_id, amount, created_at
 `
 
 type UpdateEntryParams struct {
-	ID     int64 `json:"id"`
 	Amount int64 `json:"amount"`
+	ID     int64 `json:"id"`
 }
 
 func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) (Entries, error) {
-	row := q.db.QueryRowContext(ctx, updateEntry, arg.ID, arg.Amount)
+	row := q.db.QueryRowContext(ctx, updateEntry, arg.Amount, arg.ID)
 	var i Entries
 	err := row.Scan(
 		&i.ID,

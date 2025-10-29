@@ -1,3 +1,6 @@
+coverage:
+	go test -coverprofile=coverage.out ./...
+	gocover-cobertura < coverage.out > coverage.xml
 format-sql:
 	@for file in db/query/*.sql; do \
 		pg_format "$$file" -o "$$file"; \
@@ -26,4 +29,7 @@ sqlc:
 test:
 	go test -v -cover ./...
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test
+server:
+	go run main.go
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server

@@ -10,10 +10,10 @@ import (
 )
 
 const createTransfer = `-- name: CreateTransfer :one
-INSERT INTO
-    transfers (from_account_id, to_account_id, amount)
-VALUES
-    ($1, $2, $3) RETURNING id, from_account_id, to_account_id, amount, created_at
+INSERT INTO transfers (from_account_id, to_account_id, amount)
+    VALUES ($1, $2, $3)
+RETURNING
+    id, from_account_id, to_account_id, amount, created_at
 `
 
 type CreateTransferParams struct {
@@ -36,7 +36,8 @@ func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) 
 }
 
 const deleteTransfer = `-- name: DeleteTransfer :exec
-DELETE FROM transfers WHERE id = $1
+DELETE FROM transfers
+WHERE id = $1
 `
 
 func (q *Queries) DeleteTransfer(ctx context.Context, id int64) error {
@@ -45,7 +46,13 @@ func (q *Queries) DeleteTransfer(ctx context.Context, id int64) error {
 }
 
 const getTransfer = `-- name: GetTransfer :one
-SELECT id, from_account_id, to_account_id, amount, created_at FROM transfers WHERE id = $1 LIMIT 1
+SELECT
+    id, from_account_id, to_account_id, amount, created_at
+FROM
+    transfers
+WHERE
+    id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfers, error) {
@@ -62,9 +69,13 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfers, error) 
 }
 
 const listTransfers = `-- name: ListTransfers :many
-SELECT id, from_account_id, to_account_id, amount, created_at FROM transfers
-    ORDER BY id
-    LIMIT $1 OFFSET $2
+SELECT
+    id, from_account_id, to_account_id, amount, created_at
+FROM
+    transfers
+ORDER BY
+    id
+LIMIT $1 OFFSET $2
 `
 
 type ListTransfersParams struct {
@@ -78,7 +89,7 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transfers
+	items := []Transfers{}
 	for rows.Next() {
 		var i Transfers
 		if err := rows.Scan(
@@ -102,19 +113,23 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 }
 
 const updateTransfer = `-- name: UpdateTransfer :one
-UPDATE transfers
-    SET amount = $2
-    WHERE id = $1
-    RETURNING id, from_account_id, to_account_id, amount, created_at
+UPDATE
+    transfers
+SET
+    amount = $1
+WHERE
+    id = $2
+RETURNING
+    id, from_account_id, to_account_id, amount, created_at
 `
 
 type UpdateTransferParams struct {
-	ID     int64 `json:"id"`
 	Amount int64 `json:"amount"`
+	ID     int64 `json:"id"`
 }
 
 func (q *Queries) UpdateTransfer(ctx context.Context, arg UpdateTransferParams) (Transfers, error) {
-	row := q.db.QueryRowContext(ctx, updateTransfer, arg.ID, arg.Amount)
+	row := q.db.QueryRowContext(ctx, updateTransfer, arg.Amount, arg.ID)
 	var i Transfers
 	err := row.Scan(
 		&i.ID,

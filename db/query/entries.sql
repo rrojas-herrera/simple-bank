@@ -20,8 +20,7 @@ FROM
     entries
 ORDER BY
     id
-LIMIT sqlc.arg ( LIMIT)
-    OFFSET sqlc.arg (OFFSET);
+LIMIT $1 OFFSET $2;
 
 -- name: UpdateEntry :one
 UPDATE
