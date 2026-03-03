@@ -1,5 +1,16 @@
 
-### Store
+### Create Accounts
+POST http://localhost:8080/accounts HTTP/1.1
+Content-Type: application/json
+
+{
+	"owner": "lusaet",
+	"currency": "USD"
+
+}
+
+
+### Create Transfers
 POST http://localhost:8080/transfers HTTP/1.1
 Content-Type: application/json
 
